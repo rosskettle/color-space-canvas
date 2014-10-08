@@ -1,10 +1,10 @@
 {
   "name": "color-space-canvas",
   "version": "0.1.0",
-  "description": "Renders color space gradients on a canvas element using WebGL.",
+  "description": "Renders color space gradients on a canvas element using WebGL. HSV Only at this stage.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": ""
   },
   "author": "Ross Kettle",
   "license": "MIT",
