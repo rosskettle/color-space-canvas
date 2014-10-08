@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>color</title>
+    </head>
+    <body>
+      <script src="main.js"></script>
+      <script src="shaders.js"></script>
+
+
+      h <input name="axes" type="radio" value="sv" checked/>
+      <input id="h" name="h" type="number" value="1" min="0" max="1" step="0.01"/><br/>
+
+      s <input name="axes" type="radio" value="hv"/>
+      <input id="s" name="s" type="number" value="1" min="0" max="1" step="0.01"/><br/>
+
+      v <input name="axes" type="radio" value="hs"/>
+      <input id="v" name="v" type="number" value="1" min="0" max="1" step="0.01"/><br/>
+
+      <canvas id="bar-canvas" width="256" height="20">
+      </canvas>
+      <br/>
+      <canvas id="rect-canvas" width="256" height="256">
+      </canvas>
+
+      <script>
+
+      var radioChange = function (e) {
+
+        rect.setProps({axes :e.target.value})
+        switch (e.target.value) {
+          case 'sv' :
+            bar.setProps({axes :'h'})
+            break;
+          case 'hv' :
+            bar.setProps({axes :'s'})
+            break;
+          case 'hs' :
+            bar.setProps({axes :'v'})
+            break;
+        }
+
+      }
+
+      var radios = document.getElementsByName('axes');
+      radios[0].onchange = radioChange
+      radios[1].onchange = radioChange
+      radios[2].onchange = radioChange
+
+      var inputH = document.getElementById('h');
+      var inputS = document.getElementById('s');
+      var inputV = document.getElementById('v');
+
+      var updateColorValues = function() {
+        var cols = [parseFloat(inputH.value), parseFloat(inputS.value), parseFloat(inputV.value)]
+        rect.setProps({colorValues: cols})
+        bar.setProps({colorValues: cols})
+      }
+
+      inputH.onchange = updateColorValues;
+      inputS.onchange = updateColorValues;
+      inputV.onchange = updateColorValues
+
+      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[1,1,1], axes:'sv'},document.getElementById('rect-canvas'));
+      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[1,1,1], axes:'h'},document.getElementById('bar-canvas'));
+
+
+      </script>
+
+</body>
+</html>

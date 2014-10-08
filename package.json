@@ -1,0 +1,22 @@
+{
+  "name": "color-space-canvas",
+  "version": "0.1.0",
+  "description": "Renders color space gradients on a canvas element using WebGL.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ross Kettle",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.8.7",
+    "gulp-clean": "^0.3.1",
+    "gulp-concat": "^2.3.4",
+    "gulp-connect": "^2.0.6",
+    "gulp-jshint": "^1.8.4",
+    "gulp-open": "^0.2.8",
+    "gulp-task-listing": "^0.3.0",
+    "gulp-uglify": "^0.3.1",
+    "jshint-stylish": "^0.4.0"
+  }
+}
