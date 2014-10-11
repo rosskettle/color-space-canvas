@@ -86,6 +86,11 @@ ColorSpaceCanvas.prototype = {
             return ColorSpaceCanvas.Shaders.LABSource1D
           else if (axes.length === 2)
             return ColorSpaceCanvas.Shaders.LABSource2D
+        case 'lch' :
+          if (axes.length === 1)
+            return ColorSpaceCanvas.Shaders.LCHSource1D
+          else if (axes.length === 2)
+            return ColorSpaceCanvas.Shaders.LCHSource2D
     }
   },
 
@@ -115,6 +120,8 @@ ColorSpaceCanvas.prototype = {
     switch (this._props.axes) {
       case 'l' :
       case 'ab' :
+      case 'ch' :
+
       case 'r' :
       case 'gb' :
       case 'h' :
@@ -123,6 +130,8 @@ ColorSpaceCanvas.prototype = {
         break;
       case 'a' :
       case 'lb' :
+      case 'lc' :
+
       case 'g' :
       case 'rb' :
       case 's' :
@@ -131,6 +140,8 @@ ColorSpaceCanvas.prototype = {
         break;
       case 'b' :
       case 'lb' :
+      case 'lh' :
+
       case 'b' :
       case 'rg' :
       case 'v' :
