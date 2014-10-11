@@ -76,6 +76,16 @@ ColorSpaceCanvas.prototype = {
             return ColorSpaceCanvas.Shaders.HSVSource1D
           else if (axes.length === 2)
             return ColorSpaceCanvas.Shaders.HSVSource2D
+        case 'rgb' :
+          if (axes.length === 1)
+            return ColorSpaceCanvas.Shaders.RGBSource1D
+          else if (axes.length === 2)
+            return ColorSpaceCanvas.Shaders.RGBSource2D
+        case 'lab' :
+          if (axes.length === 1)
+            return ColorSpaceCanvas.Shaders.LABSource1D
+          else if (axes.length === 2)
+            return ColorSpaceCanvas.Shaders.LABSource2D
     }
   },
 
@@ -103,14 +113,26 @@ ColorSpaceCanvas.prototype = {
     console.log('_setAxes',this._props.axes)
     var channel;
     switch (this._props.axes) {
+      case 'l' :
+      case 'ab' :
+      case 'r' :
+      case 'gb' :
       case 'h' :
       case 'sv' :
         channel = 0;
         break;
+      case 'a' :
+      case 'lb' :
+      case 'g' :
+      case 'rb' :
       case 's' :
       case 'hv' :
         channel = 1;
         break;
+      case 'b' :
+      case 'lb' :
+      case 'b' :
+      case 'rg' :
       case 'v' :
       case 'hs' :
         channel = 2;

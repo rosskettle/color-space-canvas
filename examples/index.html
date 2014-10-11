@@ -62,7 +62,7 @@
       inputS.onchange = updateColorValues;
       inputV.onchange = updateColorValues
 
-      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[1,1,1], axes:'sv'},document.getElementById('rect-canvas'));
+      var rect = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[80,0,0], axes:'ab'},document.getElementById('rect-canvas'));
       var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[1,1,1], axes:'h'},document.getElementById('bar-canvas'));
 
 
