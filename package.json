@@ -1,6 +1,6 @@
 {
   "name": "color-space-canvas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Renders color space gradients on a canvas element using WebGL. HSV Only at this stage.",
   "main": "index.js",
   "scripts": {
