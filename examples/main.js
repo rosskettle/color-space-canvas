@@ -70,28 +70,11 @@ ColorSpaceCanvas.prototype = {
   },
 
   _whichShader : function (colorSpace, axes) {
-     switch (this._props.colorSpace) {
-        case 'hsv' :
-          if (axes.length === 1)
-            return ColorSpaceCanvas.Shaders.HSVSource1D
-          else if (axes.length === 2)
-            return ColorSpaceCanvas.Shaders.HSVSource2D
-        case 'rgb' :
-          if (axes.length === 1)
-            return ColorSpaceCanvas.Shaders.RGBSource1D
-          else if (axes.length === 2)
-            return ColorSpaceCanvas.Shaders.RGBSource2D
-        case 'lab' :
-          if (axes.length === 1)
-            return ColorSpaceCanvas.Shaders.LABSource1D
-          else if (axes.length === 2)
-            return ColorSpaceCanvas.Shaders.LABSource2D
-        case 'lch' :
-          if (axes.length === 1)
-            return ColorSpaceCanvas.Shaders.LCHSource1D
-          else if (axes.length === 2)
-            return ColorSpaceCanvas.Shaders.LCHSource2D
-    }
+     var shaderBaseName = colorSpace.toUpperCase() + 'Source'
+     if (axes.length === 1)
+       return ColorSpaceCanvas.Shaders[shaderBaseName + '1D']
+     else if (axes.length === 2)
+       return ColorSpaceCanvas.Shaders[shaderBaseName + '2D']
   },
 
   _shaderProgram: null,
@@ -117,6 +100,8 @@ ColorSpaceCanvas.prototype = {
   _setAxes: function() {
     console.log('_setAxes',this._props.axes)
     var channel;
+
+
     switch (this._props.axes) {
       case 'l' :
       case 'ab' :
@@ -126,26 +111,28 @@ ColorSpaceCanvas.prototype = {
       case 'gb' :
       case 'h' :
       case 'sv' :
+      case 'sl' :
         channel = 0;
         break;
       case 'a' :
       case 'lb' :
-      case 'lc' :
+      case 'lh' :
 
       case 'g' :
       case 'rb' :
       case 's' :
       case 'hv' :
+      case 'hs' :
         channel = 1;
         break;
       case 'b' :
       case 'lb' :
-      case 'lh' :
+      case 'lc' :
 
       case 'b' :
       case 'rg' :
       case 'v' :
-      case 'hs' :
+      case 'hl' :
         channel = 2;
         break;
     }

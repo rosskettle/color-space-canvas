@@ -3,6 +3,13 @@
     <head>
         <meta charset="utf-8">
         <title>color</title>
+        <style>
+            .color-space {
+              float:left;
+              width:260px;
+            }
+        </style>
+
     </head>
     <body>
       <script src="main.js"></script>
@@ -27,28 +34,42 @@
       b <input name="axes" type="radio" value="rb"/>
       <input id="b" name="b" type="number" value="0" min="0" max="255" step="1"/><br/>
 
+      <div class="color-space">
+        <canvas id="lch-bar-canvas" width="256" height="20"></canvas>
 
-      <canvas id="lch-bar-canvas" width="256" height="20">
-      </canvas>
-      <br/>
-      <canvas id="lch-rect-canvas" width="256" height="256">
-      </canvas>
-      <br/>
+        <canvas id="lch-rect-canvas" width="256" height="256"></canvas>
+      </div>
 
+      <div class="color-space">
 
-      <canvas id="bar-canvas" width="256" height="20">
-      </canvas>
-      <br/>
-      <canvas id="rect-canvas" width="256" height="256">
-      </canvas>
-      <br/>
+        <canvas id="bar-canvas" width="256" height="20"></canvas>
+        <br/>
+        <canvas id="rect-canvas" width="256" height="256"></canvas>
+      </div>
+
+      <div class="color-space">
+        <canvas id="hsv-bar-canvas" width="256" height="20">
+        </canvas>
+        <br/>
+        <canvas id="hsv-rect-canvas" width="256" height="256">
+        </canvas>
+      </div>
+      <div class="color-space">
+        <canvas id="hsl-bar-canvas" width="256" height="20">
+        </canvas>
+        <br/>
+        <canvas id="hsl-rect-canvas" width="256" height="256">
+        </canvas>
+      </div>
+
+      <div class="color-space">
 
       <canvas id="lab-rect-canvas" width="256" height="20">
       </canvas>
       <br/>
       <canvas id="lab-bar-canvas" width="256" height="256">
       </canvas>
-
+      </div>
       <script>
 
       var radioChange = function (e) {
@@ -87,14 +108,22 @@
       inputS.onchange = updateColorValues;
       inputV.onchange = updateColorValues;
 
-      var lchrect = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[50,70,100], axes:'ch'},document.getElementById('lch-rect-canvas'));
-      var lchbar = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[50,70,0], axes:'ch'},document.getElementById('lch-bar-canvas'));
+      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[.5,.5,.8], axes:'sv'},document.getElementById('hsv-rect-canvas'));
+      var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[.5,.5,.5], axes:'h'},document.getElementById('hsv-bar-canvas'));
+
+      //var hslrect = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[.5,1,.5], axes:'hs'},document.getElementById('hsl-rect-canvas'));
+      //var hslbar = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[.5,.5,.5], axes:'hs'},document.getElementById('hsl-bar-canvas'));
 
 
-      var rect = new ColorSpaceCanvas({colorSpace:'rgb', colorValues:[0,0,0], axes:'gb'},document.getElementById('rect-canvas'));
-      var bar = new ColorSpaceCanvas({colorSpace:'rgb', colorValues:[0,0,0], axes:'r'},document.getElementById('bar-canvas'));
-      var labrect = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[0,0,0], axes:'ab'},document.getElementById('lab-rect-canvas'));
-      var labbar = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[0,0,0], axes:'lb'},document.getElementById('lab-bar-canvas'));
+      //var lchrect = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[20,90,20], axes:'lh'},document.getElementById('lch-rect-canvas'));
+      //var lchbar = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[50,70,0], axes:'ch'},document.getElementById('lch-bar-canvas'));
+
+
+      //var rect = new ColorSpaceCanvas({colorSpace:'rgb', colorValues:[0,0,0], axes:'gb'},document.getElementById('rect-canvas'));
+      //var bar = new ColorSpaceCanvas({colorSpace:'rgb', colorValues:[0,0,0], axes:'r'},document.getElementById('bar-canvas'));
+
+      //var labrect = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[0,0,0], axes:'ab'},document.getElementById('lab-rect-canvas'));
+      //var labbar = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[0,0,0], axes:'lb'},document.getElementById('lab-bar-canvas'));
 
 
       </script>
