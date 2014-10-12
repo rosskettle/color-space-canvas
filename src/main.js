@@ -6,8 +6,6 @@ var ColorSpaceCanvas = function (props, canvasElement) {
   if (typeof props === 'undefined')
     props = {};
 
-  console.log ('aaa',props.axes)
-
   this._props = {
     colorSpace:  props.colorSpace || 'hsv',
     colorValues:   props.colorValues || [1,1,1],
@@ -40,20 +38,20 @@ var ColorSpaceCanvas = function (props, canvasElement) {
 ColorSpaceCanvas.prototype = {
 
   setProps: function(changeProps) {
-    console.log(changeProps)
     for (var changeProp in changeProps) {
       if (changeProp in this._props) {
         this._props[changeProp] = changeProps[changeProp];
+        var val = changeProps[changeProp]
         switch (changeProp) {
           case 'colorValues':
-            this._setColorValues();
+            this._setColorValues(val);
           case 'constant1':
-            this._setColorValues();
+            this._setColorValues(val);
           case 'axes':
-            this._setAxes();
+            this._setAxes(val);
           case 'width':
           case 'height':
-            this._setSize();
+            this._setSize(val);
             break;
         }
       }
@@ -98,51 +96,65 @@ ColorSpaceCanvas.prototype = {
   },
 
   _setAxes: function() {
-    console.log('_setAxes',this._props.axes)
     var channel;
+    var colorSpaceAxes = this._props.colorSpace + "-" + this._props.axes;
+    var channel0 = [
+      'rgb-r',
+      'rgb-gb',
+      'hsv-h',
+      'hsv-sv',
+      'hsl-h',
+      'hsl-sl',
+      'lab-l',
+      'lab-ab',
+      'lch-l',
+      'lch-ch'
+    ];
+    var channel1 = [
+      'rgb-g',
+      'rgb-rb',
+      'hsv-s',
+      'hsv-hv',
+      'hsl-s',
+      'hsl-hl',
+      'lab-a',
+      'lab-lb',
+      'lch-c',
+      'lch-lh'
+    ];
+    var channel2 = [
+      'rgb-b',
+      'rgb-rg',
+      'hsv-v',
+      'hsv-hs',
+      'hsl-l',
+      'hsl-hs',
+      'lab-b',
+      'lab-la',
+      'lch-h',
+      'lch-lc'
+    ]
 
-
-    switch (this._props.axes) {
-      case 'l' :
-      case 'ab' :
-      case 'ch' :
-
-      case 'r' :
-      case 'gb' :
-      case 'h' :
-      case 'sv' :
-      case 'sl' :
-        channel = 0;
-        break;
-      case 'a' :
-      case 'lb' :
-      case 'lh' :
-
-      case 'g' :
-      case 'rb' :
-      case 's' :
-      case 'hv' :
-      case 'hs' :
-        channel = 1;
-        break;
-      case 'b' :
-      case 'lb' :
-      case 'lc' :
-
-      case 'b' :
-      case 'rg' :
-      case 'v' :
-      case 'hl' :
-        channel = 2;
-        break;
-    }
-
+    if (channel0.indexOf(colorSpaceAxes) > -1)
+      channel = 0;
+    else if (channel1.indexOf(colorSpaceAxes) > -1)
+      channel = 1;
+    else if (channel2.indexOf(colorSpaceAxes) > -1)
+      channel = 2;
+    else
+      throw new Error ('Unknown colorspace / axes combination.')
     this._gl.uniform1i(this._uniforms.uChannel, channel);
   },
 
 
 
   _setColorValues: function() {
+   /*switch (this._props.colorSpace) {
+      case 'hsv':
+        var vals =
+
+
+    }*/
     this._gl.uniform3fv(this._uniforms.uColorValues, new Float32Array(this._props.colorValues));
   },
 
