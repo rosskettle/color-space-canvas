@@ -8,6 +8,11 @@
               float:left;
               width:260px;
             }
+            #color-block {
+              width:100px;
+              height:100px;
+              border:1px solid black;
+            }
         </style>
 
     </head>
@@ -20,23 +25,16 @@
       <input id="h" name="h" type="number" value="0" min="0" max="359" step="1"/><br/>
 
       s <input name="axes" type="radio" value="hv"/>
-      <input id="s" name="s" type="number" value="1" min="0" max="1" step="0.01"/><br/>
+      <input id="s" name="s" type="number" value="50" min="0" max="100" step="1"/><br/>
 
       v <input name="axes" type="radio" value="hs"/>
-      <input id="v" name="v" type="number" value="1" min="0" max="1" step="0.01"/><br/>
+      <input id="v" name="v" type="number" value="50" min="0" max="100" step="1"/><br/>
+      <div id="color-block">
+      </div>
 
-      r <input name="axes" type="radio" value="gb" checked/>
-      <input id="r" name="r" type="number" value="255" min="0" max="255" step="1"/><br/>
-
-      g <input name="axes" type="radio" value="rg"/>
-      <input id="g" name="g" type="number" value="0" min="0" max="255" step="1"/><br/>
-
-      b <input name="axes" type="radio" value="rb"/>
-      <input id="b" name="b" type="number" value="0" min="0" max="255" step="1"/><br/>
 
       <div class="color-space">
         <canvas id="lch-bar-canvas" width="256" height="20"></canvas>
-
         <canvas id="lch-rect-canvas" width="256" height="256"></canvas>
       </div>
 
@@ -74,16 +72,16 @@
 
       var radioChange = function (e) {
 
-        rect.setProps({axes :e.target.value})
+        hsvrect.setProps({axes :e.target.value})
         switch (e.target.value) {
           case 'sv' :
-            bar.setProps({axes :'h'})
+            hsvbar.setProps({axes :'h'})
             break;
           case 'hv' :
-            bar.setProps({axes :'s'})
+            hsvbar.setProps({axes :'s'})
             break;
           case 'hs' :
-            bar.setProps({axes :'v'})
+            hsvbar.setProps({axes :'v'})
             break;
         }
 
@@ -98,21 +96,25 @@
       var inputS = document.getElementById('s');
       var inputV = document.getElementById('v');
 
+      var colorBlock = document.getElementById('color-block');
+
       var updateColorValues = function() {
         var cols = [parseFloat(inputH.value), parseFloat(inputS.value), parseFloat(inputV.value)]
-        rect.setProps({colorValues: cols})
-        bar.setProps({colorValues: cols})
+        hsvrect.setProps({colorValues: cols})
+        hsvbar.setProps({colorValues: cols})
+        cssHSVString = 'hsl(' + cols[0] + ',' + cols[1] + '%,' + cols[2] + '%)'
+        colorBlock.style.backgroundColor = cssHSVString;
       }
 
       inputH.onchange = updateColorValues;
       inputS.onchange = updateColorValues;
       inputV.onchange = updateColorValues;
 
-      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[.5,.5,.8], axes:'sv'},document.getElementById('hsv-rect-canvas'));
-      var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[.5,.5,.5], axes:'h'},document.getElementById('hsv-bar-canvas'));
+      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[20,20,40], axes:'sv'},document.getElementById('hsv-rect-canvas'));
+      var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[180,20,40], axes:'h'},document.getElementById('hsv-bar-canvas'));
 
-      //var hslrect = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[.5,1,.5], axes:'hs'},document.getElementById('hsl-rect-canvas'));
-      //var hslbar = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[.5,.5,.5], axes:'hs'},document.getElementById('hsl-bar-canvas'));
+      //var hslrect = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-rect-canvas'));
+      //var hslbar = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-bar-canvas'));
 
 
       //var lchrect = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[20,90,20], axes:'lh'},document.getElementById('lch-rect-canvas'));

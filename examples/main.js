@@ -8,7 +8,6 @@ var ColorSpaceCanvas = function (props, canvasElement) {
 
   this._props = {
     colorSpace:  props.colorSpace || 'hsv',
-    colorValues:   props.colorValues || [1,1,1],
     axes:        props.axes || 'sv'
   };
 
@@ -28,27 +27,34 @@ var ColorSpaceCanvas = function (props, canvasElement) {
 
   this._gl = this._getContext();
   this._initGL(this._quadVertices(), this._fragmentShaderSource);
+
   this._setSize();
-  this._setAxes();
-  this._setColorValues();
+  this._setAxes(props.axes);
+  this._setColorValues(props.colorValues);
   this.draw();
 
 }
 
 ColorSpaceCanvas.prototype = {
 
+  getGLContext: function() {
+    return this._gl;
+  },
+
   setProps: function(changeProps) {
     for (var changeProp in changeProps) {
       if (changeProp in this._props) {
-        this._props[changeProp] = changeProps[changeProp];
         var val = changeProps[changeProp]
         switch (changeProp) {
           case 'colorValues':
             this._setColorValues(val);
+            break;
           case 'constant1':
             this._setColorValues(val);
+            break;
           case 'axes':
             this._setAxes(val);
+            break;
           case 'width':
           case 'height':
             this._setSize(val);
@@ -95,7 +101,8 @@ ColorSpaceCanvas.prototype = {
     this._gl.uniform2f(this._uniforms.uResolution, this._props.width, this._props.height);
   },
 
-  _setAxes: function() {
+  _setAxes: function(axes) {
+    this._props.axes = axes;
     var channel;
     var colorSpaceAxes = this._props.colorSpace + "-" + this._props.axes;
     var channel0 = [
@@ -148,14 +155,19 @@ ColorSpaceCanvas.prototype = {
 
 
 
-  _setColorValues: function() {
-   /*switch (this._props.colorSpace) {
+  _setColorValues: function(inputValues) {
+   switch (this._props.colorSpace) {
       case 'hsv':
-        var vals =
+      case 'hsl':
+        this._props.colorValues = [
+          inputValues[0] / 360,
+          inputValues[1] / 100,
+          inputValues[2] / 100
+        ]
+      break;
 
-
-    }*/
-    this._gl.uniform3fv(this._uniforms.uColorValues, new Float32Array(this._props.colorValues));
+   }
+   this._gl.uniform3fv(this._uniforms.uColorValues, new Float32Array(this._props.colorValues));
   },
 
   _createElement: function() {
