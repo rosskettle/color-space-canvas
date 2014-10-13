@@ -161,8 +161,8 @@ ColorSpaceCanvas.prototype = {
       case 'hsl':
         this._props.colorValues = [
           inputValues[0] / 360,
-          inputValues[1] / 100,
-          inputValues[2] / 100
+          inputValues[1],
+          inputValues[2]
         ]
       break;
 

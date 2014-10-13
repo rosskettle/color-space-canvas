@@ -110,8 +110,8 @@
       inputS.onchange = updateColorValues;
       inputV.onchange = updateColorValues;
 
-      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[20,20,40], axes:'sv'},document.getElementById('hsv-rect-canvas'));
-      var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[180,20,40], axes:'h'},document.getElementById('hsv-bar-canvas'));
+      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[90,1,1], axes:'hs'},document.getElementById('hsv-rect-canvas'));
+      var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[180,.2,.4], axes:'h'},document.getElementById('hsv-bar-canvas'));
 
       //var hslrect = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-rect-canvas'));
       //var hslbar = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-bar-canvas'));
