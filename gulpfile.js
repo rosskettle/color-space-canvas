@@ -7,14 +7,27 @@ var connect     = require('gulp-connect');
 var open        = require('gulp-open');
 var jshint      = require('gulp-jshint');
 var stylish     = require('jshint-stylish');
+var wrap        = require('shader-wrapper');
 
 gulp.task('help', taskListing);
 
-gulp.task('build', ['copy'], function() {
-    return gulp.src('./src/*.js')
-        .pipe(uglify())
-        .pipe(concat('color-space-canvas.min.js'))
-        .pipe(gulp.dest('./dist'))
+gulp.task('collate-shaders', function(cb) {
+  var payload = {
+    src:      './src/shaders/*.glsl',
+    dest:     './src/shaders.js',
+    header:   'ColorSpaceCanvas.Shaders = {\n',
+    footer:   '\n}',
+    complete: cb
+  }
+  wrap(payload);
+});
+
+gulp.task('build', ['collate-shaders','copy'], function() {
+  console.log('build.......');
+  return gulp.src('./src/*.js')
+    .pipe(uglify())
+    .pipe(concat('color-space-canvas.min.js'))
+    .pipe(gulp.dest('./dist'))
 });
 
 gulp.task('copy', function(){
@@ -41,7 +54,7 @@ gulp.task('html', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch(['./src/*.js'], ['build','html']);
+  gulp.watch(['./src/**'], ['build','html']);
 });
 
 gulp.task("open", function(){

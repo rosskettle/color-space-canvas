@@ -22,13 +22,13 @@
 
 
       h <input name="axes" type="radio" value="sv" checked/>
-      <input id="h" name="h" type="number" value="0" min="0" max="359" step="1"/><br/>
+      <input id="h" name="h" type="range" value="0" min="0" max="359" step="1"/><br/>
 
       s <input name="axes" type="radio" value="hv"/>
-      <input id="s" name="s" type="number" value="50" min="0" max="100" step="1"/><br/>
+      <input id="s" name="s" type="range" value="50" min="0" max="100" step="1"/><br/>
 
       v <input name="axes" type="radio" value="hs"/>
-      <input id="v" name="v" type="number" value="50" min="0" max="100" step="1"/><br/>
+      <input id="v" name="v" type="range" value="50" min="0" max="100" step="1"/><br/>
       <div id="color-block">
       </div>
 
@@ -110,7 +110,7 @@
       inputS.onchange = updateColorValues;
       inputV.onchange = updateColorValues;
 
-      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[90,1,1], axes:'hs'},document.getElementById('hsv-rect-canvas'));
+      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[90,1,1], axes:'sv'},document.getElementById('hsv-rect-canvas'));
       var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[180,.2,.4], axes:'h'},document.getElementById('hsv-bar-canvas'));
 
       //var hslrect = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-rect-canvas'));

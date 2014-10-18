@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>color</title>
+        <script type="text/javascript" src="lib/chroma.js"></script>
+        <style>
+
+            #controls {
+              border:1px solid black;
+              width:256px;
+              height:80px;
+              padding:5px;
+            }
+
+            #inputs {
+              float:left;
+            }
+
+            #color-block {
+              width:50px;
+              height:50px;
+              border:1px solid black;
+              float:left;
+              margin:5px;
+            }
+
+            #color-space {
+              display:block;
+              width:260px;
+            }
+
+            #rect-wrapper, #bar-wrapper {
+              position: relative;
+            }
+
+            #marker {
+              width:10px;
+              height:10px;
+              -webkit-border-radius:50%;
+              -webkit-transform: translate(-5px, -5px);
+              border:1px solid red;
+              position:absolute;
+              left:0px;
+              top:0px;
+              pointer-events:none;
+            }
+
+            #slider {
+              width:6px;
+              height:10px;
+
+              -webkit-transform: translate(-4px, -10px);
+              border:1px solid red;
+              position:absolute;
+              left:0px;
+              top:0px;
+              pointer-events:none;
+            }
+
+            label {
+              display: inline-block;
+              width:10px;
+            }
+
+        </style>
+
+    </head>
+    <body>
+      <script src="main.js"></script>
+      <script src="shaders.js"></script>
+
+      <div id="controls">
+        <div id="inputs">
+          <label for="c0">H</label>
+          <input name="axes" type="radio" value="sv" checked/>
+          <input id="c0" name="c0" type="range" value="90" min="0" max="359" step="1"/><br/>
+
+          <label for="c1">S</label>
+          <input name="axes" type="radio" value="hv"/>
+          <input id="c1" name="c1" type="range" value=".5" min="0" max="1" step=".01"/><br/>
+
+          <label for="c2">V</label>
+          <input name="axes" type="radio" value="hs"/>
+          <input id="c2" name="c2" type="range" value=".5" min="0" max="1" step=".01"/><br/>
+        </div>
+        <div id="color-block">
+        </div>
+      </div>
+
+
+
+      <div id="color-space">
+        <div id="bar-wrapper">
+          <canvas id="bar-canvas" width="256" height="20"></canvas>
+          <div id="slider"></div>
+        </div>
+        <div id="rect-wrapper">
+          <canvas id="rect-canvas" width="256" height="256"></canvas>
+          <div id="marker"></div>
+        </div>
+
+
+      </div>
+
+      <script>
+
+      var radioChange = function (e) {
+
+        rect.setProps({axes :e.target.value})
+        switch (e.target.value) {
+          case 'sv' :
+            bar.setProps({axes :'h'})
+            break;
+          case 'hv' :
+            bar.setProps({axes :'s'})
+            break;
+          case 'hs' :
+            bar.setProps({axes :'v'})
+            break;
+        }
+
+      }
+
+      // ----Model----
+      var colorValues = [90,.5,.5];
+      Array.observe(colorValues,function(changes){
+        console.log(changes)
+        rect.setProps({colorValues: colorValues});
+        bar.setProps({colorValues: colorValues});
+        updateColorBlock(colorValues);
+        console.log(colorValues)
+      })
+
+      // -------------
+
+      var radios = document.getElementsByName('axes');
+      radios[0].onchange = radioChange
+      radios[1].onchange = radioChange
+      radios[2].onchange = radioChange
+
+      var input0 = document.getElementById('c0');
+      var input1 = document.getElementById('c1');
+      var input2 = document.getElementById('c2');
+
+      var colorBlock = document.getElementById('color-block');
+
+      var rectCanvas = document.getElementById('rect-canvas');
+      var barCanvas  = document.getElementById('bar-canvas');
+      var marker     = document.getElementById('marker');
+
+      rectCanvas.onclick = function (e) {
+        console.log('click', e.target,e.clientX,e.target.offsetParent.offsetLeft);
+        var x = e.clientX - e.target.offsetParent.offsetLeft;
+        var y = e.clientY - e.target.offsetParent.offsetTop;
+        marker.style.left = x +'px';
+        marker.style.top  = y +'px';
+
+        console.log(x,y)
+      }
+
+      var updateColorBlock = function(cols) {
+        var rgb = chroma.hsv(cols).rgb()
+        cssString = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+        colorBlock.style.backgroundColor = cssString;
+      }
+
+
+
+      input0.onchange = function(){
+        colorValues[0] = parseFloat(input0.value)
+      }
+      input1.onchange = function(){
+        colorValues[1] = parseFloat(input1.value)
+      }
+      input2.onchange =  function(){
+        colorValues[2] = parseFloat(input2.value)
+      }
+
+
+      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: colorValues, axes:'sv'}, rectCanvas);
+      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: colorValues, axes:'h'}, barCanvas);
+
+      updateColorBlock(colorValues);
+      </script>
+
+</body>
+</html>
