@@ -48,10 +48,10 @@
 
             #slider {
               width:6px;
-              height:10px;
+              height:20px;
 
-              -webkit-transform: translate(-4px, -10px);
-              border:1px solid red;
+              -webkit-transform: translate(-4px);
+              border:1px solid white;
               position:absolute;
               left:0px;
               top:0px;
@@ -74,15 +74,15 @@
         <div id="inputs">
           <label for="c0">H</label>
           <input name="axes" type="radio" value="sv" checked/>
-          <input id="c0" name="c0" type="range" value="90" min="0" max="359" step="1"/><br/>
+          <input id="c0" name="c0" type="number" value="90" min="0" max="359" step="1"/><br/>
 
           <label for="c1">S</label>
           <input name="axes" type="radio" value="hv"/>
-          <input id="c1" name="c1" type="range" value=".5" min="0" max="1" step=".01"/><br/>
+          <input id="c1" name="c1" type="number" value=".5" min="0" max="1" step=".01"/><br/>
 
           <label for="c2">V</label>
           <input name="axes" type="radio" value="hs"/>
-          <input id="c2" name="c2" type="range" value=".5" min="0" max="1" step=".01"/><br/>
+          <input id="c2" name="c2" type="number" value=".5" min="0" max="1" step=".01"/><br/>
         </div>
         <div id="color-block">
         </div>
@@ -105,39 +105,48 @@
 
       <script>
 
-      var radioChange = function (e) {
-
-        rect.setProps({axes :e.target.value})
-        switch (e.target.value) {
-          case 'sv' :
-            bar.setProps({axes :'h'})
-            break;
-          case 'hv' :
-            bar.setProps({axes :'s'})
-            break;
-          case 'hs' :
-            bar.setProps({axes :'v'})
-            break;
-        }
-
-      }
 
       // ----Model----
-      var colorValues = [90,.5,.5];
-      Array.observe(colorValues,function(changes){
-        console.log(changes)
-        rect.setProps({colorValues: colorValues});
-        bar.setProps({colorValues: colorValues});
-        updateColorBlock(colorValues);
-        console.log(colorValues)
+      //var colorValues = [90,.5,.5];
+      var model = {
+        colorValues: [90,.5,.5],
+        axes: 'sv'
+      }
+
+      Array.observe(model.colorValues,function(changes){
+        rect.setProps({colorValues: model.colorValues});
+        bar.setProps({colorValues: model.colorValues});
+        updateColorBlock(model.colorValues);
+        input0.value = model.colorValues[0];
+        input1.value = model.colorValues[1];
+        input2.value = model.colorValues[2];
+
       })
 
-      // -------------
+      Object.observe(model, function(changes) {
+        rect.setProps({axes: model.axes})
+        if (model.axes == 'sv')
+          barAxis = 'h';
+        else if (model.axes == 'hv')
+          barAxis = 's';
+        else if (model.axes == 'hs')
+          barAxis = 'v';
+        bar.setProps({axes: barAxis})
+      })
 
+
+
+      // ------------
       var radios = document.getElementsByName('axes');
+      var radioChange = function (e) {
+        model.axes = e.target.value;
+      }
+
       radios[0].onchange = radioChange
       radios[1].onchange = radioChange
       radios[2].onchange = radioChange
+
+
 
       var input0 = document.getElementById('c0');
       var input1 = document.getElementById('c1');
@@ -149,14 +158,35 @@
       var barCanvas  = document.getElementById('bar-canvas');
       var marker     = document.getElementById('marker');
 
+      var updateMarkerPositions = function() {
+
+
+      }
+
+      var setMarkerPosition = function (x,y) {
+        marker.style.left = x + 'px';
+        marker.style.top  = y + 'px';
+      }
+
       rectCanvas.onclick = function (e) {
         console.log('click', e.target,e.clientX,e.target.offsetParent.offsetLeft);
         var x = e.clientX - e.target.offsetParent.offsetLeft;
         var y = e.clientY - e.target.offsetParent.offsetTop;
-        marker.style.left = x +'px';
-        marker.style.top  = y +'px';
 
-        console.log(x,y)
+        model.colorValues[1] = 1 / 255 * x
+        model.colorValues[2] = 1 - 1 / 255 * y
+
+        setMarkerPosition(x,y);
+      }
+
+      var setSliderPosition = function (x) {
+        slider.style.left = x + 'px';
+      }
+
+      barCanvas.onclick = function (e) {
+        var x = e.clientX - e.target.offsetParent.offsetLeft;
+        model.colorValues[0] = (1 / 255 * x) * 360;
+        setSliderPosition(x);
       }
 
       var updateColorBlock = function(cols) {
@@ -165,23 +195,21 @@
         colorBlock.style.backgroundColor = cssString;
       }
 
-
-
       input0.onchange = function(){
-        colorValues[0] = parseFloat(input0.value)
+        model.colorValues[0] = parseFloat(input0.value)
       }
       input1.onchange = function(){
-        colorValues[1] = parseFloat(input1.value)
+        model.colorValues[1] = parseFloat(input1.value)
       }
       input2.onchange =  function(){
-        colorValues[2] = parseFloat(input2.value)
+        model.colorValues[2] = parseFloat(input2.value)
       }
 
 
-      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: colorValues, axes:'sv'}, rectCanvas);
-      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: colorValues, axes:'h'}, barCanvas);
+      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'sv'}, rectCanvas);
+      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'h'}, barCanvas);
 
-      updateColorBlock(colorValues);
+      updateColorBlock(model.colorValues);
       </script>
 
 </body>
