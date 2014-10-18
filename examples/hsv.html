@@ -74,15 +74,15 @@
         <div id="inputs">
           <label for="c0">H</label>
           <input name="axes" type="radio" value="sv" checked/>
-          <input id="c0" name="c0" type="number" value="90" min="0" max="359" step="1"/><br/>
+          <input id="c0" name="c0" type="range" value="90" min="0" max="359" step="1"/><br/>
 
           <label for="c1">S</label>
           <input name="axes" type="radio" value="hv"/>
-          <input id="c1" name="c1" type="number" value=".5" min="0" max="1" step=".01"/><br/>
+          <input id="c1" name="c1" type="range" value=".5" min="0" max="1" step=".01"/><br/>
 
           <label for="c2">V</label>
           <input name="axes" type="radio" value="hs"/>
-          <input id="c2" name="c2" type="number" value=".5" min="0" max="1" step=".01"/><br/>
+          <input id="c2" name="c2" type="range" value=".5" min="0" max="1" step=".01"/><br/>
         </div>
         <div id="color-block">
         </div>
@@ -107,7 +107,6 @@
 
 
       // ----Model----
-      //var colorValues = [90,.5,.5];
       var model = {
         colorValues: [90,.5,.5],
         axes: 'sv'
@@ -120,7 +119,7 @@
         input0.value = model.colorValues[0];
         input1.value = model.colorValues[1];
         input2.value = model.colorValues[2];
-
+        updateMarkerPositions();
       })
 
       Object.observe(model, function(changes) {
@@ -132,11 +131,10 @@
         else if (model.axes == 'hs')
           barAxis = 'v';
         bar.setProps({axes: barAxis})
+        updateMarkerPositions();
       })
-
-
-
       // ------------
+
       var radios = document.getElementsByName('axes');
       var radioChange = function (e) {
         model.axes = e.target.value;
@@ -159,7 +157,28 @@
       var marker     = document.getElementById('marker');
 
       var updateMarkerPositions = function() {
+        var x,y,z;
+        switch (model.axes) {
+          case 'sv' :
+            x = 255 * model.colorValues[1]
+            y = 255 - 255 * model.colorValues[2]
+            z = 255 * model.colorValues[0] / 360
+            break;
+          case 'hv' :
+            console.log(model.colorValues[0])
+            x = 255 * model.colorValues[0] / 360
+            y = 255 - 255 * model.colorValues[2]
+            z = 255 * model.colorValues[1]
+            break;
+          case 'hs' :
+            x = 255 * model.colorValues[0] / 360
+            y = 255 -255 * model.colorValues[1]
+            z = 255 * model.colorValues[2]
+            break;
 
+        }
+        setMarkerPosition(x,y);
+        setSliderPosition(z);
 
       }
 
@@ -169,24 +188,45 @@
       }
 
       rectCanvas.onclick = function (e) {
-        console.log('click', e.target,e.clientX,e.target.offsetParent.offsetLeft);
         var x = e.clientX - e.target.offsetParent.offsetLeft;
         var y = e.clientY - e.target.offsetParent.offsetTop;
 
-        model.colorValues[1] = 1 / 255 * x
-        model.colorValues[2] = 1 - 1 / 255 * y
+        switch (model.axes) {
+          case 'sv' :
+            model.colorValues[1] = 1 / 255 * x;
+            model.colorValues[2] = 1 - 1 / 255 * y;
+            break;
+          case 'hv' :
+            model.colorValues[0] = 1 / 255 * x * 360;
+            model.colorValues[2] = 1 - 1 / 255 * y;
+            break;
+          case 'hs' :
+            model.colorValues[0] = 1 / 255 * x * 360;
+            model.colorValues[1] = 1 - 1 / 255 * y;
+            break;
 
-        setMarkerPosition(x,y);
+        }
       }
 
-      var setSliderPosition = function (x) {
-        slider.style.left = x + 'px';
+      var setSliderPosition = function (z) {
+        slider.style.left = z + 'px';
       }
 
       barCanvas.onclick = function (e) {
         var x = e.clientX - e.target.offsetParent.offsetLeft;
-        model.colorValues[0] = (1 / 255 * x) * 360;
-        setSliderPosition(x);
+
+        switch (model.axes) {
+          case 'sv' :
+            model.colorValues[0] = (1 / 255 * x) * 360;
+            break;
+          case 'hv' :
+            model.colorValues[1] = (1 / 255 * x);
+            break;
+          case 'hs' :
+            model.colorValues[2] = (1 / 255 * x);
+            break;
+
+        }
       }
 
       var updateColorBlock = function(cols) {
