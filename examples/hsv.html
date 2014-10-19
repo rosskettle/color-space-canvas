@@ -73,15 +73,15 @@
       <div id="controls">
         <div id="inputs">
           <label for="c0">H</label>
-          <input name="axes" type="radio" value="sv" checked/>
+          <input name="axes" type="radio" value="yz" checked/>
           <input id="c0" name="c0" type="range" value="90" min="0" max="359" step="1"/><br/>
 
           <label for="c1">S</label>
-          <input name="axes" type="radio" value="hv"/>
+          <input name="axes" type="radio" value="xz"/>
           <input id="c1" name="c1" type="range" value=".5" min="0" max="1" step=".01"/><br/>
 
           <label for="c2">V</label>
-          <input name="axes" type="radio" value="hs"/>
+          <input name="axes" type="radio" value="xy"/>
           <input id="c2" name="c2" type="range" value=".5" min="0" max="1" step=".01"/><br/>
         </div>
         <div id="color-block">
@@ -109,7 +109,7 @@
       // ----Model----
       var model = {
         colorValues: [90,.5,.5],
-        axes: 'sv'
+        axes: 'yz'
       }
 
       Array.observe(model.colorValues,function(changes){
@@ -124,12 +124,12 @@
 
       Object.observe(model, function(changes) {
         rect.setProps({axes: model.axes})
-        if (model.axes == 'sv')
-          barAxis = 'h';
-        else if (model.axes == 'hv')
-          barAxis = 's';
-        else if (model.axes == 'hs')
-          barAxis = 'v';
+        if (model.axes == 'yz')
+          barAxis = 'x';
+        else if (model.axes == 'xz')
+          barAxis = 'y';
+        else if (model.axes == 'xy')
+          barAxis = 'z';
         bar.setProps({axes: barAxis})
         updateMarkerPositions();
       })
@@ -159,18 +159,18 @@
       var updateMarkerPositions = function() {
         var x,y,z;
         switch (model.axes) {
-          case 'sv' :
+          case 'yz' :
             x = 255 * model.colorValues[1]
             y = 255 - 255 * model.colorValues[2]
             z = 255 * model.colorValues[0] / 360
             break;
-          case 'hv' :
+          case 'xz' :
             console.log(model.colorValues[0])
             x = 255 * model.colorValues[0] / 360
             y = 255 - 255 * model.colorValues[2]
             z = 255 * model.colorValues[1]
             break;
-          case 'hs' :
+          case 'xy' :
             x = 255 * model.colorValues[0] / 360
             y = 255 -255 * model.colorValues[1]
             z = 255 * model.colorValues[2]
@@ -192,15 +192,15 @@
         var y = e.clientY - e.target.offsetParent.offsetTop;
 
         switch (model.axes) {
-          case 'sv' :
+          case 'yz' :
             model.colorValues[1] = 1 / 255 * x;
             model.colorValues[2] = 1 - 1 / 255 * y;
             break;
-          case 'hv' :
+          case 'xz' :
             model.colorValues[0] = 1 / 255 * x * 360;
             model.colorValues[2] = 1 - 1 / 255 * y;
             break;
-          case 'hs' :
+          case 'xy' :
             model.colorValues[0] = 1 / 255 * x * 360;
             model.colorValues[1] = 1 - 1 / 255 * y;
             break;
@@ -216,13 +216,13 @@
         var x = e.clientX - e.target.offsetParent.offsetLeft;
 
         switch (model.axes) {
-          case 'sv' :
+          case 'yz' :
             model.colorValues[0] = (1 / 255 * x) * 360;
             break;
-          case 'hv' :
+          case 'xz' :
             model.colorValues[1] = (1 / 255 * x);
             break;
-          case 'hs' :
+          case 'xy' :
             model.colorValues[2] = (1 / 255 * x);
             break;
 
@@ -245,9 +245,9 @@
         model.colorValues[2] = parseFloat(input2.value)
       }
 
+      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'x'}, barCanvas);
 
-      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'sv'}, rectCanvas);
-      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'h'}, barCanvas);
+      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'yz'}, rectCanvas);
 
       updateColorBlock(model.colorValues);
       </script>

@@ -104,7 +104,10 @@ ColorSpaceCanvas.prototype = {
   _setAxes: function(axes) {
     this._props.axes = axes;
     var channel;
-    var colorSpaceAxes = this._props.colorSpace + "-" + this._props.axes;
+
+    var axes = this._props.axes;
+    var colorSpace = this._props.colorSpace;
+    var colorSpaceAxes = colorSpace + "-" + axes;
     var channel0 = [
       'rgb-r',
       'rgb-gb',
@@ -142,14 +145,22 @@ ColorSpaceCanvas.prototype = {
       'lch-lc'
     ]
 
-    if (channel0.indexOf(colorSpaceAxes) > -1)
+    if (axes == 'x' || axes == 'yz')
       channel = 0;
-    else if (channel1.indexOf(colorSpaceAxes) > -1)
+    else if (axes == 'y' || axes == 'xz')
       channel = 1;
-    else if (channel2.indexOf(colorSpaceAxes) > -1)
+    else if (axes == 'z' || axes == 'xy')
       channel = 2;
-    else
-      throw new Error ('Unknown colorspace / axes combination.')
+    else {
+      if (channel0.indexOf(colorSpaceAxes) > -1)
+        channel = 0;
+      else if (channel1.indexOf(colorSpaceAxes) > -1)
+        channel = 1;
+      else if (channel2.indexOf(colorSpaceAxes) > -1)
+        channel = 2;
+      else
+        throw new Error ('Unknown colorspace / axes combination.')
+    }
     this._gl.uniform1i(this._uniforms.uChannel, channel);
   },
 
