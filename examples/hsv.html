@@ -105,12 +105,30 @@
 
       <script>
 
+      var normalizeX = null;
+      var normalizeY = null;
+      var normalizeZ = null;
+
+      var normalizeHue = function (degrees) {
+        return 1 / 360 * degrees;
+      }
+
+      var denormalizeHue = function (ratio) {
+        return ratio * 360;
+      }
+
+      var identity = function(val) {
+        return val;
+      }
 
       // ----Model----
       var model = {
         colorValues: [90,.5,.5],
-        axes: 'yz'
+        axes: 'yz',
+        normalizeX: normalizeHue
       }
+
+
 
       Array.observe(model.colorValues,function(changes){
         rect.setProps({colorValues: model.colorValues});
@@ -162,16 +180,16 @@
           case 'yz' :
             x = 255 * model.colorValues[1]
             y = 255 - 255 * model.colorValues[2]
-            z = 255 * model.colorValues[0] / 360
+            z = 255 * model.normalizeX(model.colorValues[0])
             break;
           case 'xz' :
             console.log(model.colorValues[0])
-            x = 255 * model.colorValues[0] / 360
+            x = 255 * model.normalizeX(model.colorValues[0])
             y = 255 - 255 * model.colorValues[2]
             z = 255 * model.colorValues[1]
             break;
           case 'xy' :
-            x = 255 * model.colorValues[0] / 360
+            x = 255 * model.normalizeX(model.colorValues[0])
             y = 255 -255 * model.colorValues[1]
             z = 255 * model.colorValues[2]
             break;
