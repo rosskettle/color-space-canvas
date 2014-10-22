@@ -3,16 +3,66 @@
     <head>
         <meta charset="utf-8">
         <title>color</title>
+        <script type="text/javascript" src="lib/chroma.js"></script>
         <style>
-            .color-space {
+
+            #controls {
+              border:1px solid black;
+              width:256px;
+              height:80px;
+              padding:5px;
+            }
+
+            #inputs {
               float:left;
+            }
+
+            #color-block {
+              width:50px;
+              height:50px;
+              border:1px solid black;
+              float:left;
+              margin:5px;
+            }
+
+            #color-space {
+              display:block;
               width:260px;
             }
-            #color-block {
-              width:100px;
-              height:100px;
-              border:1px solid black;
+
+            #rect-wrapper, #bar-wrapper {
+              position: relative;
             }
+
+            #marker {
+              width:10px;
+              height:10px;
+              -webkit-border-radius:50%;
+              -webkit-transform: translate(-5px, -5px);
+              border:1px solid red;
+              position:absolute;
+              left:0px;
+              top:0px;
+              pointer-events:none;
+            }
+
+            #slider {
+              width:6px;
+              height:20px;
+
+              -webkit-transform: translate(-4px);
+              border:1px solid white;
+              position:absolute;
+              left:0px;
+              top:0px;
+              pointer-events:none;
+            }
+
+            label {
+              display: inline-block;
+              width:10px;
+            }
+
         </style>
 
     </head>
@@ -20,114 +70,40 @@
       <script src="main.js"></script>
       <script src="shaders.js"></script>
 
+      <div id="controls">
+        <div id="inputs">
+          <label for="c0">H</label>
+          <input name="axes" type="radio" value="yz" checked/>
+          <input id="c0" name="c0" type="number" value="90" min="0" max="359" step="1"/><br/>
 
-      h <input name="axes" type="radio" value="sv" checked/>
-      <input id="h" name="h" type="range" value="0" min="0" max="359" step="1"/><br/>
+          <label for="c1">S</label>
+          <input name="axes" type="radio" value="xz"/>
+          <input id="c1" name="c1" type="number" value=".5" min="0" max="1" step=".01"/><br/>
 
-      s <input name="axes" type="radio" value="hv"/>
-      <input id="s" name="s" type="range" value="50" min="0" max="100" step="1"/><br/>
-
-      v <input name="axes" type="radio" value="hs"/>
-      <input id="v" name="v" type="range" value="50" min="0" max="100" step="1"/><br/>
-      <div id="color-block">
+          <label for="c2">V</label>
+          <input name="axes" type="radio" value="xy"/>
+          <input id="c2" name="c2" type="number" value=".5" min="0" max="1" step=".01"/><br/>
+        </div>
+        <div id="color-block">
+        </div>
       </div>
 
 
-      <div class="color-space">
-        <canvas id="lch-bar-canvas" width="256" height="20"></canvas>
-        <canvas id="lch-rect-canvas" width="256" height="256"></canvas>
+
+      <div id="color-space">
+        <div id="bar-wrapper">
+          <canvas id="bar-canvas" width="256" height="20"></canvas>
+          <div id="slider"></div>
+        </div>
+        <div id="rect-wrapper">
+          <canvas id="rect-canvas" width="256" height="256"></canvas>
+          <div id="marker"></div>
+        </div>
+
+
       </div>
 
-      <div class="color-space">
-
-        <canvas id="bar-canvas" width="256" height="20"></canvas>
-        <br/>
-        <canvas id="rect-canvas" width="256" height="256"></canvas>
-      </div>
-
-      <div class="color-space">
-        <canvas id="hsv-bar-canvas" width="256" height="20">
-        </canvas>
-        <br/>
-        <canvas id="hsv-rect-canvas" width="256" height="256">
-        </canvas>
-      </div>
-      <div class="color-space">
-        <canvas id="hsl-bar-canvas" width="256" height="20">
-        </canvas>
-        <br/>
-        <canvas id="hsl-rect-canvas" width="256" height="256">
-        </canvas>
-      </div>
-
-      <div class="color-space">
-
-      <canvas id="lab-rect-canvas" width="256" height="20">
-      </canvas>
-      <br/>
-      <canvas id="lab-bar-canvas" width="256" height="256">
-      </canvas>
-      </div>
-      <script>
-
-      var radioChange = function (e) {
-
-        hsvrect.setProps({axes :e.target.value})
-        switch (e.target.value) {
-          case 'sv' :
-            hsvbar.setProps({axes :'h'})
-            break;
-          case 'hv' :
-            hsvbar.setProps({axes :'s'})
-            break;
-          case 'hs' :
-            hsvbar.setProps({axes :'v'})
-            break;
-        }
-
-      }
-
-      var radios = document.getElementsByName('axes');
-      radios[0].onchange = radioChange
-      radios[1].onchange = radioChange
-      radios[2].onchange = radioChange
-
-      var inputH = document.getElementById('h');
-      var inputS = document.getElementById('s');
-      var inputV = document.getElementById('v');
-
-      var colorBlock = document.getElementById('color-block');
-
-      var updateColorValues = function() {
-        var cols = [parseFloat(inputH.value), parseFloat(inputS.value), parseFloat(inputV.value)]
-        hsvrect.setProps({colorValues: cols})
-        hsvbar.setProps({colorValues: cols})
-        cssHSVString = 'hsl(' + cols[0] + ',' + cols[1] + '%,' + cols[2] + '%)'
-        colorBlock.style.backgroundColor = cssHSVString;
-      }
-
-      inputH.onchange = updateColorValues;
-      inputS.onchange = updateColorValues;
-      inputV.onchange = updateColorValues;
-
-      var hsvrect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[90,1,1], axes:'sv'},document.getElementById('hsv-rect-canvas'));
-      var hsvbar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[180,.2,.4], axes:'h'},document.getElementById('hsv-bar-canvas'));
-
-      //var hslrect = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-rect-canvas'));
-      //var hslbar = new ColorSpaceCanvas({colorSpace:'hsl', colorValues:[180,20,40], axes:'hs'},document.getElementById('hsl-bar-canvas'));
-
-
-      //var lchrect = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[20,90,20], axes:'lh'},document.getElementById('lch-rect-canvas'));
-      //var lchbar = new ColorSpaceCanvas({colorSpace:'lch', colorValues:[50,70,0], axes:'ch'},document.getElementById('lch-bar-canvas'));
-
-
-      //var rect = new ColorSpaceCanvas({colorSpace:'rgb', colorValues:[0,0,0], axes:'gb'},document.getElementById('rect-canvas'));
-      //var bar = new ColorSpaceCanvas({colorSpace:'rgb', colorValues:[0,0,0], axes:'r'},document.getElementById('bar-canvas'));
-
-      //var labrect = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[0,0,0], axes:'ab'},document.getElementById('lab-rect-canvas'));
-      //var labbar = new ColorSpaceCanvas({colorSpace:'lab', colorValues:[0,0,0], axes:'lb'},document.getElementById('lab-bar-canvas'));
-
-
+      <script src="example.js">
       </script>
 
 </body>

@@ -1,110 +1,3 @@
-<!doctype html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>color</title>
-        <script type="text/javascript" src="lib/chroma.js"></script>
-        <style>
-
-            #controls {
-              border:1px solid black;
-              width:256px;
-              height:80px;
-              padding:5px;
-            }
-
-            #inputs {
-              float:left;
-            }
-
-            #color-block {
-              width:50px;
-              height:50px;
-              border:1px solid black;
-              float:left;
-              margin:5px;
-            }
-
-            #color-space {
-              display:block;
-              width:260px;
-            }
-
-            #rect-wrapper, #bar-wrapper {
-              position: relative;
-            }
-
-            #marker {
-              width:10px;
-              height:10px;
-              -webkit-border-radius:50%;
-              -webkit-transform: translate(-5px, -5px);
-              border:1px solid red;
-              position:absolute;
-              left:0px;
-              top:0px;
-              pointer-events:none;
-            }
-
-            #slider {
-              width:6px;
-              height:20px;
-
-              -webkit-transform: translate(-4px);
-              border:1px solid white;
-              position:absolute;
-              left:0px;
-              top:0px;
-              pointer-events:none;
-            }
-
-            label {
-              display: inline-block;
-              width:10px;
-            }
-
-        </style>
-
-    </head>
-    <body>
-      <script src="main.js"></script>
-      <script src="shaders.js"></script>
-
-      <div id="controls">
-        <div id="inputs">
-          <label for="c0">H</label>
-          <input name="axes" type="radio" value="yz" checked/>
-          <input id="c0" name="c0" type="range" value="90" min="0" max="359" step="1"/><br/>
-
-          <label for="c1">S</label>
-          <input name="axes" type="radio" value="xz"/>
-          <input id="c1" name="c1" type="range" value=".5" min="0" max="1" step=".01"/><br/>
-
-          <label for="c2">V</label>
-          <input name="axes" type="radio" value="xy"/>
-          <input id="c2" name="c2" type="range" value=".5" min="0" max="1" step=".01"/><br/>
-        </div>
-        <div id="color-block">
-        </div>
-      </div>
-
-
-
-      <div id="color-space">
-        <div id="bar-wrapper">
-          <canvas id="bar-canvas" width="256" height="20"></canvas>
-          <div id="slider"></div>
-        </div>
-        <div id="rect-wrapper">
-          <canvas id="rect-canvas" width="256" height="256"></canvas>
-          <div id="marker"></div>
-        </div>
-
-
-      </div>
-
-      <script>
-
       var normalizeX = null;
       var normalizeY = null;
       var normalizeZ = null;
@@ -122,16 +15,24 @@
       }
 
       // ----Model----
-      var model = {
-        colorValues: [90,.5,.5],
-        axes: 'yz',
-        normalizeX: normalizeHue
+
+
+
+      var hsvModel = {
+        colorSpace:   'hsl',
+        axes:         'yz',
+        colorValues:  [90,.5,.5],
+        normalizeX:   normalizeHue,
+        denormalizeX: denormalizeHue
       }
 
 
 
+      model = hsvModel;
+
       Array.observe(model.colorValues,function(changes){
         rect.setProps({colorValues: model.colorValues});
+        console.log(model.colorValues)
         bar.setProps({colorValues: model.colorValues});
         updateColorBlock(model.colorValues);
         input0.value = model.colorValues[0];
@@ -183,7 +84,6 @@
             z = 255 * model.normalizeX(model.colorValues[0])
             break;
           case 'xz' :
-            console.log(model.colorValues[0])
             x = 255 * model.normalizeX(model.colorValues[0])
             y = 255 - 255 * model.colorValues[2]
             z = 255 * model.colorValues[1]
@@ -215,11 +115,11 @@
             model.colorValues[2] = 1 - 1 / 255 * y;
             break;
           case 'xz' :
-            model.colorValues[0] = 1 / 255 * x * 360;
+            model.colorValues[0] = 1 / 255 * model.denormalizeX(x);
             model.colorValues[2] = 1 - 1 / 255 * y;
             break;
           case 'xy' :
-            model.colorValues[0] = 1 / 255 * x * 360;
+            model.colorValues[0] = 1 / 255 * model.denormalizeX(x);
             model.colorValues[1] = 1 - 1 / 255 * y;
             break;
 
@@ -248,7 +148,7 @@
       }
 
       var updateColorBlock = function(cols) {
-        var rgb = chroma.hsv(cols).rgb()
+        var rgb = chroma[model.colorSpace](cols).rgb()
         cssString = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
         colorBlock.style.backgroundColor = cssString;
       }
@@ -263,12 +163,9 @@
         model.colorValues[2] = parseFloat(input2.value)
       }
 
-      var bar = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'x'}, barCanvas);
+      var bar = new ColorSpaceCanvas({colorSpace:model.colorSpace, colorValues: model.colorValues, axes:'x'}, barCanvas);
 
-      var rect = new ColorSpaceCanvas({colorSpace:'hsv', colorValues: model.colorValues, axes:'yz'}, rectCanvas);
+      var rect = new ColorSpaceCanvas({colorSpace:model.colorSpace, colorValues: model.colorValues, axes:'yz'}, rectCanvas);
 
       updateColorBlock(model.colorValues);
-      </script>
-
-</body>
-</html>
+      updateMarkerPositions();

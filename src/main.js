@@ -1,6 +1,6 @@
 var ColorSpaceCanvas = function (props, canvasElement) {
   if (!(this instanceof ColorSpaceCanvas)){
-    return new ColorSpaceCanvas(userProps, canvasElement);
+    return new ColorSpaceCanvas(props, canvasElement);
   }
 
   if (typeof props === 'undefined')
@@ -47,9 +47,6 @@ ColorSpaceCanvas.prototype = {
         var val = changeProps[changeProp]
         switch (changeProp) {
           case 'colorValues':
-            this._setColorValues(val);
-            break;
-          case 'constant1':
             this._setColorValues(val);
             break;
           case 'axes':
@@ -161,15 +158,18 @@ ColorSpaceCanvas.prototype = {
       else
         throw new Error ('Unknown colorspace / axes combination.')
     }
+
     this._gl.uniform1i(this._uniforms.uChannel, channel);
   },
 
 
 
   _setColorValues: function(inputValues) {
+    console.log('_setColorValues',inputValues)
    switch (this._props.colorSpace) {
       case 'hsv':
       case 'hsl':
+      case 'lch':
         this._props.colorValues = [
           inputValues[0] / 360,
           inputValues[1],

@@ -30,16 +30,16 @@ void main(void) {
    float H, S, L;
    if (uChannel == cH) {
       H = x;
-      S = uColorValues.y;
-      L = y;
+      S = 1.0;
+      L = 0.5;
    } else if (uChannel == cS) {
-      H = x;
-      S = uColorValues.y;
-      L = y;
-   } else if (uChannel == cL) {
-      H = x;
-      S = y;
+      H = uColorValues.x;
+      S = x;
       L = uColorValues.z;
+   } else if (uChannel == cL) {
+      H = uColorValues.x;
+      S = uColorValues.y;
+      L = x;
    }
 
    vec3 rgb;

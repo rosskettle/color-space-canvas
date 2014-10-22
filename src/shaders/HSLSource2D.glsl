@@ -29,8 +29,8 @@ void main(void) {
    float y = 1.0 / uResolution.y * gl_FragCoord.y;
    float H, S, L;
    if (uChannel == cH) {
-      H = x;
-      S = uColorValues.y;
+      H = uColorValues.x;
+      S = x;
       L = y;
    } else if (uChannel == cS) {
       H = x;
