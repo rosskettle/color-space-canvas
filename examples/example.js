@@ -1,3 +1,6 @@
+
+
+
       var normalizeX = null;
       var normalizeY = null;
       var normalizeZ = null;
@@ -19,16 +22,55 @@
 
 
       var hsvModel = {
+        colorSpace:   'hsv',
+        axes:         'yz',
+        labels:       ['hue','saturation','values'],
+        colorValues:  [90,.5,.5],
+        normalizeX:   normalizeHue,
+        denormalizeX: denormalizeHue
+
+      }
+
+      var hslModel = {
         colorSpace:   'hsl',
+        axes:         'yz',
+        labels:       ['hue','saturation','lightness'],
+        colorValues:  [90,.5,.5],
+        normalizeX:   normalizeHue,
+        denormalizeX: denormalizeHue
+      }
+
+      var rgbModel = {
+        colorSpace:   'rgb',
+        labels:       ['red','green','blue'],
+        axes:         'yz',
+        colorValues:  [255,0,0],
+        normalizeX:   identity,
+        denormalizeX: identity
+      }
+
+      var labModel = {
+        colorSpace:   'lab',
+        labels:       ['L','a','b'],
         axes:         'yz',
         colorValues:  [90,.5,.5],
         normalizeX:   normalizeHue,
         denormalizeX: denormalizeHue
       }
 
+      var lchModel = {
+        colorSpace:   'lch',
+        labels:       ['L','chroma','hue'],
+        axes:         'yz',
+        colorValues:  [90,.5,.5],
+        normalizeX:   normalizeHue,
+        denormalizeX: denormalizeHue
+      }
+
+      model = rgbModel;
 
 
-      model = hsvModel;
+
 
       Array.observe(model.colorValues,function(changes){
         rect.setProps({colorValues: model.colorValues});
