@@ -97,6 +97,7 @@ ColorSpaceCanvas.prototype = {
         }
       }
     }
+    this.draw();
   },
 
   draw: function() {
