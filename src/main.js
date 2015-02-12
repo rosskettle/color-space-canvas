@@ -7,8 +7,10 @@ var ColorSpaceCanvas = function (props, canvasElement) {
     props = {};
 
   this._props = {
-    colorSpace:  props.colorSpace || 'hsv',
-    axes:        props.axes || 'sv'
+    colorSpace:        props.colorSpace || 'hsv',
+    axes:              props.axes || 'sv',
+    handleLostContext: props.handleLostContext,
+    useFallback:       (typeof props.useFallback === 'undefined') ? false : props.useFallback
   };
 
   if (typeof canvasElement !== 'undefined') {
@@ -23,10 +25,25 @@ var ColorSpaceCanvas = function (props, canvasElement) {
     this.element = this._createElement();
   }
 
-  this._fragmentShaderSource = this._whichShader(this._props.colorSpace, this._props.axes);
+  if (!this._props.useFallback) {
+    this._gl = this._getContext();
+    if (this._gl === null) {
+      this._props.useFallback = true;
+    }
+  }
 
-  this._gl = this._getContext();
-  this._initGL(this._quadVertices(), this._fragmentShaderSource);
+
+  if (this._props.useFallback) {
+    if (this._props.colorSpace !== 'hsv')
+      throw new Error('Fallback is currently only available for hsv.')
+    if (this._props.axes !== 'h' && this._props.axes !== 'sv')
+      throw new Error('Fallback is currently only available for axes x and yz.')
+    this._initFallback()
+  } else {
+    self = this;
+    this.element.addEventListener("webglcontextlost", function(event) {self._handleLostContext(event)}, false);
+    this._initGL();
+  }
 
   this._setSize();
   this._setAxes(props.axes);
@@ -36,6 +53,27 @@ var ColorSpaceCanvas = function (props, canvasElement) {
 }
 
 ColorSpaceCanvas.prototype = {
+
+  simulateLostContext: function() {
+    loseContextExtension = this._gl.getExtension('WEBGL_lose_context')
+      || this._gl.getExtension('WEBKIT_WEBGL_lose_context')
+      || this._gl.getExtension('MOZ_WEBGL_lose_context')
+
+    if (loseContextExtension === null)
+      throw new Error('Cannot simulate webGL context loss becase there is no WEBGL_lose_context extension.')
+
+    loseContextExtension.loseContext()
+  },
+
+  _handleLostContext: function(event) {
+    if (this._props.handleLostContext){
+      this._props.handleLostContext(event, this._props);
+    } else {
+      console.warn ('WebGL Context was lost, but there is no handleLostContext callback.')
+    }
+
+  },
+
 
   getGLContext: function() {
     return this._gl;
@@ -63,11 +101,117 @@ ColorSpaceCanvas.prototype = {
   },
 
   draw: function() {
-    var gl = this._gl;
+    if (this._props.useFallback) {
+      this._drawFallback();
+    } else {
+      var gl = this._gl;
+      gl.clearColor(1, 1, 1, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+  },
 
-    gl.clearColor(1, 1, 1, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  _initFallback: function() {
+    this._ctx = this.element.getContext('2d');
+  },
+
+  _drawFallback: function () {
+    if (this._props.axes === 'h')
+      this._hsvX();
+    else if (this._props.axes === 'sv')
+      this._hsvYZ();
+    else
+      throw new Error('Axes combination currently unsupported.')
+  },
+
+  _hsvX: function () {
+    ctx = this._ctx;
+    width = this._props.width;
+    height = this._props.height;
+
+    var imageData = ctx.createImageData(this._props.width, this._props.height)
+
+    for (var x = 0; x < width; x++) {
+      hsv = {h: (360 / width) * x, s: 1, v: 1};
+      rgb = this._hsv2rgb(hsv, true);
+      for (var y = 0; y < height; y++) {
+        offset = y * width * 4 + x * 4
+        imageData.data[offset    ] = rgb.r * 255;
+        imageData.data[offset + 1] = rgb.g * 255;
+        imageData.data[offset + 2] = rgb.b * 255;
+        imageData.data[offset + 3] = 255;
+
+      }
+    }
+
+    ctx.putImageData(imageData,0,0)
+  },
+
+  _hsvYZ: function () {
+    ctx = this._ctx;
+    width = this._props.width;
+    height = this._props.height;
+
+    var imageData = ctx.createImageData(this._props.width, this._props.height)
+    var offset = 0;
+
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        hsv = {h: this._props.colorValues[0], s: 1 / width * x, v: 1 - 1 / height * y};
+        rgb = this._hsv2rgb(hsv, false);
+        imageData.data[offset ++] = rgb.r * 255;
+        imageData.data[offset ++] = rgb.g * 255;
+        imageData.data[offset ++] = rgb.b * 255;
+        imageData.data[offset ++] = 255;
+      }
+    }
+
+    ctx.putImageData(imageData,0,0)
+  },
+
+  _hsv2rgb: function (hsv, useDeg) {
+    var rgb = {};
+    var h = hsv.h;
+
+    if (useDeg === true)
+      h *= 1 / 360;
+
+    h *= 6.0;
+    if (h == 6.0)
+      h = 0.0;
+    var i = Math.floor(h);
+    var f = h - i;
+
+    var p = hsv.v * (1.0 - hsv.s);
+    var q = hsv.v * (1.0 - hsv.s * f);
+    var t = hsv.v * (1.0 - hsv.s * (1.0 - f));
+
+    if (i == 0) {
+      rgb.r = hsv.v;
+      rgb.g = t;
+      rgb.b = p;
+    } else if (i == 1) {
+      rgb.r = q;
+      rgb.g = hsv.v;
+      rgb.b = p;
+    } else if (i == 2) {
+      rgb.r = p;
+      rgb.g = hsv.v;
+      rgb.b = t;
+    } else if (i == 3) {
+      rgb.r = p;
+      rgb.g = q;
+      rgb.b = hsv.v;
+    } else if (i == 4) {
+      rgb.r = t;
+      rgb.g = p;
+      rgb.b = hsv.v;
+    } else {
+      rgb.r = hsv.v;
+      rgb.g = p;
+      rgb.b = q;
+    }
+    return rgb;
   },
 
   _whichShader : function (colorSpace, axes) {
@@ -89,9 +233,11 @@ ColorSpaceCanvas.prototype = {
   _setSize: function() {
     this.element.setAttribute('width', this._props.width);
     this.element.setAttribute('height', this._props.height);
-    this._gl.viewport(0, 0, this._props.width, this._props.height);
-    this._gl.uniform2f(this._uniforms.uResolution, this._props.width, this._props.height);
-    this._setResolution();
+    if (!this._props.useFallback) {
+      this._gl.viewport(0, 0, this._props.width, this._props.height);
+      this._gl.uniform2f(this._uniforms.uResolution, this._props.width, this._props.height);
+      this._setResolution();
+    }
   },
 
   _setResolution: function() {
@@ -159,13 +305,14 @@ ColorSpaceCanvas.prototype = {
         throw new Error ('Unknown colorspace / axes combination.')
     }
 
-    this._gl.uniform1i(this._uniforms.uChannel, channel);
+    if (!this._props.useFallback) {
+      this._gl.uniform1i(this._uniforms.uChannel, channel);
+    }
   },
 
 
 
   _setColorValues: function(inputValues) {
-    console.log('_setColorValues',inputValues)
    switch (this._props.colorSpace) {
       case 'hsv':
       case 'hsl':
@@ -178,7 +325,9 @@ ColorSpaceCanvas.prototype = {
       break;
 
    }
-   this._gl.uniform3fv(this._uniforms.uColorValues, new Float32Array(this._props.colorValues));
+   if (!this._props.useFallback) {
+     this._gl.uniform3fv(this._uniforms.uColorValues, new Float32Array(this._props.colorValues));
+   }
   },
 
   _createElement: function() {
@@ -197,19 +346,18 @@ ColorSpaceCanvas.prototype = {
     ]);
   },
 
-  _initGL: function(quadVertices, fragmentShaderSource) {
+  _initGL: function() {
+    fragmentShaderSource = this._whichShader(this._props.colorSpace, this._props.axes);
     this._shaderProgram = this._loadShaders(fragmentShaderSource);
     this._uniforms = this._getUniforms(this._shaderProgram);
     this._attributes = this._getAttributes(this._shaderProgram);
-
-    this._vertexBuffer = this._loadVertexBuffer(quadVertices);
+    this._vertexBuffer = this._loadVertexBuffer(this._quadVertices());
     this._bind();
   },
 
 
   _loadShaders: function(fragmentShaderSource) {
     var gl = this._gl;
-
 
     var vertSource = [
       'attribute vec2 aXY;',

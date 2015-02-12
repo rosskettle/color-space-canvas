@@ -67,7 +67,7 @@
         denormalizeX: denormalizeHue
       }
 
-      model = rgbModel;
+      model = hsvModel;
 
 
 
@@ -205,9 +205,13 @@
         model.colorValues[2] = parseFloat(input2.value)
       }
 
-      var bar = new ColorSpaceCanvas({colorSpace:model.colorSpace, colorValues: model.colorValues, axes:'x'}, barCanvas);
+      var handleLostContext = function (event, props) {
+        console.log (event,props)
+      }
+      console.log('sdfsdfs')
+      var bar = new ColorSpaceCanvas({handleLostContext:handleLostContext, colorSpace:model.colorSpace, colorValues: model.colorValues, axes:'x'}, barCanvas);
 
-      var rect = new ColorSpaceCanvas({colorSpace:model.colorSpace, colorValues: model.colorValues, axes:'yz'}, rectCanvas);
+      var rect = new ColorSpaceCanvas({handleLostContext:handleLostContext, colorSpace:model.colorSpace, colorValues: model.colorValues, axes:'yz'}, rectCanvas);
 
       updateColorBlock(model.colorValues);
       updateMarkerPositions();

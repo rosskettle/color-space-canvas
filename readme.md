@@ -6,6 +6,8 @@ Uses WebGL shaders to renders color spaces on HTML canvas elements. Useful for c
 HSV Color space is fully functional.
 HSL, RGB, Lab and HCL are in development.
 
+Fallback to 2d canvas context if webgl not available (hsv only)
+
 ##Usage
 
 H (Hue) is a value between 0-360 degrees
@@ -28,6 +30,7 @@ The following will render (S)aturation along the x axis and (V)alue along the y 
 The following will render (H)ue along the x axis.
      
     var hsv = new ColorSpaceCanvas({colorSpace:'hsv', colorValues:[0,1,1], axes:'h'}, hsvCanvas);
+
 
 
 
