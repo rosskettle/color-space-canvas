@@ -14,7 +14,7 @@ var config = {
     colorSpace:        'hsv',
     colorValues:       [90,.5,.5],
     axes:              'sv',
-    useFallback:       true
+    useFallback:       false
   }
 
 var rectCanvas = document.getElementById('rect-canvas');
