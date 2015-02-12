@@ -16,7 +16,7 @@ gulp.task('collate-shaders', function(cb) {
     src:      './src/shaders/*.glsl',
     dest:     './src/shaders.js',
     header:   'ColorSpaceCanvas.Shaders = {\n',
-    footer:   '\n}',
+    footer:   '\n}; if (typeof module !== \'undefined\') module.exports = ColorSpaceCanvas.Shaders;',
     complete: cb
   }
   wrap(payload);
